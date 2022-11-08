@@ -27,7 +27,12 @@ void ATank::Tick(float DeltaTime)
     {
         FHitResult HitResult;
         TankPlayerController->GetHitResultUnderCursor(ECC_Visibility, false, HitResult);
-        RotateTurret(HitResult.ImpactPoint);
+        // if actor is not self, rotate turret
+        if (HitResult.GetActor() && HitResult.GetActor() != this)
+        {
+            FVector HitLocation = HitResult.ImpactPoint;
+            RotateTurret(HitLocation);
+        }
     }
 }
 

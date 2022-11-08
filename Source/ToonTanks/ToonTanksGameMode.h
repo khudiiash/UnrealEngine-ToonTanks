@@ -20,6 +20,11 @@ public:
 	void ActorDied(AActor* DeadActor);
 private:
 	class ATank* Tank;
+	class AToonTanksPlayerController* ToonTanksPlayerController;
 	void HandleTankDeath();
 	void HandleTowerDeath(class ATower* Tower);
+
+	float StartDelay = 3.f;
+
+	void HandleGameStart();
 };
