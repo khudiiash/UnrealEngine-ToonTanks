@@ -3,6 +3,7 @@
 
 #include "Tank.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "ToonTanksGameMode.h"
 #include "Camera/CameraComponent.h"
 
 ATank::ATank()
@@ -17,6 +18,7 @@ void ATank::BeginPlay()
 {
     Super::BeginPlay();
     TankPlayerController = Cast<APlayerController>(GetController());
+    GameModeRef = Cast<AToonTanksGameMode>(GetWorld()->GetAuthGameMode());
 }
 
 void ATank::Tick(float DeltaTime)
@@ -61,4 +63,14 @@ void ATank::HandleDestruction()
     Super::HandleDestruction();
     SetActorHiddenInGame(true);
     SetActorTickEnabled(false);
+}
+
+bool ATank::isAlive() const
+{
+    if (!GameModeRef)
+    {
+        UE_LOG(LogTemp, Error, TEXT("GameModeRef is null"));
+        return false;
+    }
+    return GameModeRef->bGameOver == false;
 }

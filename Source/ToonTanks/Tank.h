@@ -18,12 +18,19 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
+	
+
 
 public:
 	ATank();
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;	
 	void HandleDestruction();
+	bool isAlive() const;
+	
+	// update health bar
+	UFUNCTION(BlueprintImplementableEvent)
+	void UpdateHealthBar(float HealthPercentage);
 
 	APlayerController* GetPlayerController() const { return TankPlayerController; };
 private:
@@ -43,4 +50,5 @@ private:
 	void Turn(float Value);
 
 	APlayerController* TankPlayerController;
+	class AToonTanksGameMode* GameModeRef;
 };

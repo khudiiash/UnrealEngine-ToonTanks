@@ -19,21 +19,26 @@ protected:
 	
 	UFUNCTION(BlueprintImplementableEvent)
 	void StartGame();
+
+	UFUNCTION(BlueprintCallable)
+	void SetGameOver();
 	
 	UFUNCTION(BlueprintImplementableEvent)
 	void GameOver(bool bWonGame);
 public:
 	void ActorDied(AActor* DeadActor);
+
+	UPROPERTY(EditAnywhere, Category = "Game Loop")
+	bool bGameOver = false;
+	
 private:
 	class ATank* Tank;
 	class AToonTanksPlayerController* ToonTanksPlayerController;
+	
 	void HandleTankDeath();
-	void HandleTowerDeath(class ATower* Tower);
+	void HandleGameStart();
+	int32 GetEnemiesCount() const;
 
 	float StartDelay = 3.f;
-
-	void HandleGameStart();
-
-	int32 TargetTowers = 0;
-	int32 GetTargetTowersCount() const;
+	int32 Enemies = 0;
 };

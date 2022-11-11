@@ -4,6 +4,7 @@
 #include "ToonTanksGameMode.h"
 #include "Kismet/GameplayStatics.h"
 #include "Tank.h"
+#include "EnemyTank.h"
 #include "ToonTanksPlayerController.h"
 #include "Tower.h"
 
@@ -11,14 +12,20 @@ void AToonTanksGameMode::ActorDied(AActor* DeadActor)
 {
     bool IsTank = DeadActor == Tank;
     ATower* Tower = Cast<ATower>(DeadActor);
+    AEnemyTank* EnemyTank = Cast<AEnemyTank>(DeadActor);
     if (IsTank) HandleTankDeath();
-    if (Tower) HandleTowerDeath(Tower); 
+    if (Tower || EnemyTank) {
+        if (Tower) Tower->HandleDestruction();
+        if (EnemyTank) EnemyTank->HandleDestruction();
+        Enemies--;
+        if (Enemies <= 0) GameOver(true);
+    }
 }
 
 void AToonTanksGameMode::BeginPlay()
 {
     Super::BeginPlay();
-    TargetTowers = GetTargetTowersCount();
+    Enemies = GetEnemiesCount();
     Tank = Cast<ATank>(UGameplayStatics::GetPlayerPawn(this, 0));
     ToonTanksPlayerController = Cast<AToonTanksPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
     HandleGameStart();
@@ -33,12 +40,6 @@ void AToonTanksGameMode::HandleTankDeath()
     ToonTanksPlayerController->SetPlayerEnabledState(false);
 }
 
-void AToonTanksGameMode::HandleTowerDeath(ATower* Tower)
-{
-    Tower->HandleDestruction();
-    if (--TargetTowers <= 0) GameOver(true);
-}
-
 void AToonTanksGameMode::HandleGameStart()
 {
     StartGame();
@@ -49,9 +50,16 @@ void AToonTanksGameMode::HandleGameStart()
     GetWorldTimerManager().SetTimer(PlayerEnableTimerHandle, PlayerEnableTimerDelegate, StartDelay, false);
 }
 
-int32 AToonTanksGameMode::GetTargetTowersCount() const
+int32 AToonTanksGameMode::GetEnemiesCount() const
 {
+    TArray<AActor*> EnemyTanks;
     TArray<AActor*> Towers;
+    UGameplayStatics::GetAllActorsOfClass(this, AEnemyTank::StaticClass(), EnemyTanks);
     UGameplayStatics::GetAllActorsOfClass(this, ATower::StaticClass(), Towers);
-    return Towers.Num();
+    return EnemyTanks.Num() + Towers.Num();
+}
+
+void AToonTanksGameMode::SetGameOver()
+{
+    bGameOver = true;
 }

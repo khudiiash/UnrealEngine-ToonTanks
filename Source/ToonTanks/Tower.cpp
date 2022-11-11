@@ -31,7 +31,7 @@ bool ATower::IsTankInTange()
 
 void ATower::CheckFireCondition()
 {
-    if (!Tank) return;
+    if (!Tank || !Tank->isAlive()) return;
     if (IsTankInTange()) Fire();
 }
 

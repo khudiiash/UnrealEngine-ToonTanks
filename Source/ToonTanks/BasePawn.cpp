@@ -4,6 +4,8 @@
 #include "BasePawn.h"
 #include "Components/CapsuleComponent.h"
 #include "Projectile.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundBase.h"
 #include "DrawDebugHelpers.h"
 
 // Sets default values
@@ -28,6 +30,8 @@ ABasePawn::ABasePawn()
 void ABasePawn::HandleDestruction()
 {
 	// TODO: Visual & Sound effects
+	UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation());
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), DeathParticles, GetActorLocation());
 }
 
 void ABasePawn::RotateTurret(FVector LookAtTarget)
@@ -36,6 +40,19 @@ void ABasePawn::RotateTurret(FVector LookAtTarget)
 	TurretMesh->SetWorldRotation(
 		FMath::RInterpTo(TurretMesh->GetComponentRotation(), 
 		LookAtLocation.Rotation(), 
+		GetWorld()->DeltaTimeSeconds, 25.f)
+	);
+}
+
+void ABasePawn::RotateBase(FVector LookAtTarget)
+{
+	FVector LookAtLocation = LookAtTarget - BaseMesh->GetComponentLocation();
+	FRotator LookAtRotation = LookAtLocation.Rotation();
+	LookAtRotation.Pitch = 0.f;
+	LookAtRotation.Roll = 0.f;
+	BaseMesh->SetWorldRotation(
+		FMath::RInterpTo(BaseMesh->GetComponentRotation(), 
+		LookAtRotation, 
 		GetWorld()->DeltaTimeSeconds, 25.f)
 	);
 }
